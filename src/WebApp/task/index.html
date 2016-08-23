@@ -1,0 +1,188 @@
+<!doctype html>
+
+<html>
+<head>
+    <title>test</title>
+    <link href="jsPlumbToolkit-defaults.css" rel="stylesheet" />
+    <script src="../Scripts/jquery-1.10.2.min.js"></script>
+    <script src="jsPlumb-2.1.5-min.js"></script>
+    <style>
+        .start {
+            background-color: blueviolet;
+        }
+
+        .window {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background-color: aqua;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas">
+        <span class="window start">start</span>
+
+        <span class="window">element3</span>
+
+        <span class="window">element2</span>
+
+        <span class="window">element3</span>
+
+        <span class="window">element2</span>
+
+        <span class="window">element3</span>
+
+        <span class="window start">End</span>
+    </div>
+
+
+    <script>
+        jsPlumb.ready(function () {
+            var instance = window.jsp = jsPlumb.getInstance({
+                DragOptions: { cursor: 'pointer', zIndex: 2000 },
+                Endpoint: ["Dot", { radius: 1 }],
+                EndpointStyle: { fillStyle: "#999999" },
+                Container: "canvas",
+                ConnectionOverlays: [
+           ["Arrow", {
+               location: 1,
+               visible: true,
+               id: "ARROW",
+               events: {
+                   click: function () { alert("you clicked on the arrow overlay") }
+               }
+           }],
+           ["Label", {
+               location: 0.1,
+               id: "label",
+               cssClass: "aLabel",
+               events: {
+                   tap: function () { alert("hey"); }
+               }
+           }]
+                ],
+            });
+
+
+            var endpointOptions = {
+                isSource: true,
+                isTarget: true,
+                endpoint: ["Dot", { radius: 3 }],
+                style: { fillStyle: 'blue', outlineColor: "black", outlineWidth: 1 },
+                //connector: "Straight",
+                connector: ["StateMachine", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true }],
+                maxConnections: -1,
+                anchors: ["RightMiddle", "LeftMiddle"],
+                connectorStyle: { lineWidth: 20, strokeStyle: 'blue' },
+
+            };
+            var sourceEndpoint = {
+                endpoint: ["Dot", { radius: 8 }],
+                endpointStyle: { fillStyle: "black", outlineColor: "white", outlineWidth: 1 },
+                isSource: true,
+                style: { fillStyle: 'blue', outlineColor: "red", outlineWidth: 2 },
+                maxConnections: -1,
+                dropOptions: {
+                    drop: function (e, ui) {
+                        alert('sourceEndpoint drop!');
+                    }
+                }
+
+            };
+            var targetEndpoint = {
+                endpoint: ["Dot", { radius: 8 }],
+                endpointStyle: { fillStyle: "white", outlineColor: "black", outlineWidth: 1 },
+                isTarget: true,
+                maxConnections: -1,
+                dropOptions: {
+                    drop: function (e, ui) {
+                        alert('targetEndpoint drop!');
+                    }
+                }
+            };
+            var windows = jsPlumb.getSelector(".window");
+            instance.draggable(windows, { grid: [20, 20] });
+
+            instance.batch(function () {
+
+              
+                for (var i = 0; i < windows.length; i++) {
+                    instance.addEndpoint(windows[i], sourceEndpoint, { anchor: "Continuous" });
+                    instance.addEndpoint(windows[i], targetEndpoint, { anchor: "Left" });
+                }
+
+                instance.bind("click", function (connection, originalEvent) {
+                    if (confirm("Delete connection from " + connection.sourceId + " to " + connection.targetId + "?")) {
+                        instance.detach(connection);
+                    }
+                });
+                instance.bind("connection", function (connectionInfo, originalEvent) {
+                    var connection = connectionInfo.connection;
+                    connection.getOverlay("label").setLabel($("#" + connection.targetId).text() + "-" + $("#" + connection.targetId).text());
+                });
+                instance.bind("connectionDrag", function (connection) {
+                    console.log("connection " + connection.id + " is being dragged. suspendedElement is ", connection.suspendedElement, " of type ", connection.suspendedElementType);
+                });
+
+                instance.bind("connectionDragStop", function (connection) {
+                    console.log("connection " + connection.id + " was dragged");
+                });
+
+                instance.bind("connectionMoved", function (connectionInfo) {
+                    console.log("connection " + params.connection.id + " was moved");
+                });
+            });
+
+            //jsPlumb.makeTarget("someScope", {
+            //    anchor: "RightMiddle"
+            //});
+            //jsPlumb.makeTarget("element3", {
+            //    anchor: "LeftMiddle"
+            //});
+            //jsPlumb.makeTarget("element4", {
+            //    anchor: "LeftMiddle"
+            //});
+            //jsPlumb.fire("jsPlumbDemoLoaded", instance);
+
+
+
+            //var instance = jsPlumb.getInstance({
+            //    Connector: "StateMachine",
+            //    PaintStyle: { lineWidth: 3, strokeStyle: "#ffa500", "dashstyle": "2 4" },
+            //    Endpoint: ["Dot", { radius: 5 }],
+            //    EndpointStyle: { fillStyle: "#ffa500" },
+            //    Container: "canvas",
+            //    connector: ["Flowchart", { stub: [40, 60], gap: 10, cornerRadius: 5, alwaysRespectStubs: true }],
+            //});
+
+            //var shapes = jsPlumb.getSelector(".window");
+            //// make everything draggable
+            //instance.draggable(shapes);
+
+            //// suspend drawing and initialise.
+            //instance.batch(function () {
+
+            //    // loop through them and connect each one to each other one.
+            //    for (var i = 0; i < shapes.length; i++) {
+            //        for (var j = i + 1; j < shapes.length; j++) {
+            //            instance.connect({
+            //                source: shapes[i],  // just pass in the current node in the selector for source
+            //                target: shapes[j],
+            //                // here we supply a different anchor for source and for target, and we get the element's "data-shape"
+            //                // attribute to tell us what shape we should use, as well as, optionally, a rotation value.
+            //                anchors: [
+            //                    ["Perimeter", { shape: shapes[i].getAttribute("data-shape"), rotation: shapes[i].getAttribute("data-rotation") }],
+            //                    ["Perimeter", { shape: shapes[j].getAttribute("data-shape"), rotation: shapes[j].getAttribute("data-rotation") }]
+            //                ]
+            //            });
+            //        }
+            //    }
+            //});
+
+            jsPlumb.fire("jsPlumbDemoLoaded", instance);
+
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+﻿@model WebApplication1.Models.ActivityDependence
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>ActivityDependence</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BackwardActivity.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BackwardActivity.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ForwardActivity.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ForwardActivity.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DependenceType)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DependenceType)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
