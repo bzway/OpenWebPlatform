@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "Demo";
+} 
+
+<div id="mytree"></div>
+
+@section scripts{
+<link href="~/Content/jqtree.css" rel="stylesheet" />
+<link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+<script src="~/Scripts/tree.jquery.js"></script>
+    
+    <script>
+        $(function () {
+            $('#using_html_1').jstree();
+            $('#using_html_2').jstree();
+            $('#using_html_3').jstree();
+            $('#using_html_4').jstree();
+        });
+    </script>
+}
